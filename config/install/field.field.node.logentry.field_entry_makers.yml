@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - elog
+  config:
+    - field.storage.node.field_entry_makers
+    - node.type.logentry
+id: node.logentry.field_entry_makers
+field_name: field_entry_makers
+entity_type: node
+bundle: logentry
+label: 'Entry Makers'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

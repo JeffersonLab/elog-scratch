@@ -17,12 +17,20 @@ function elog_uninstall() {
     if ($field_storage = Drupal\field\Entity\FieldStorageConfig::loadByName('node', 'field_attachments')) {
         $field_storage->delete();
     }
+    if ($field_storage = Drupal\field\Entity\FieldStorageConfig::loadByName('node', 'field_entry_makers')) {
+        $field_storage->delete();
+    }
+    if ($field_storage = Drupal\field\Entity\FieldStorageConfig::loadByName('node', 'field_notify')) {
+        $field_storage->delete();
+    }
 
     // It should be safe to simply call the items below without checking for existence
     // first because getEditable will instantiate the object if it doesn't exist
     // and then we'll promptly delete it either way.
     Drupal::configFactory()->getEditable('node.logentry.field_logbooks')->delete();
     Drupal::configFactory()->getEditable('node.field_logbooks')->delete();
+    Drupal::configFactory()->getEditable('node.field_entry_makers')->delete();
+    Drupal::configFactory()->getEditable('node.field_notify')->delete();
 }
 
 

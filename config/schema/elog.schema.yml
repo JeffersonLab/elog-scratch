@@ -1,0 +1,7 @@
+field.field_settings.lognumber:
+  type: mapping
+  label: 'lognumber settings'
+  mapping:
+    initial_value:
+      type: integer
+      label: 'Initial Value'

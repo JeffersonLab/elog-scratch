@@ -6,11 +6,101 @@
  * Time: 10:58 AM
  */
 
+
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\taxonomy\Entity\Term;
+
+
 /**
  * Implements hook_uninstall().
  */
-function elog_uninstall() {
+function elog_install()
+{
+    _elog_make_foreign_keys();
+    _elog_initialize_vocabularies();
+}
 
+
+/**
+ * Implements hook_uninstall().
+ */
+function elog_uninstall()
+{
+    _elog_delete_field_storage();
+    _elog_delete_config();
+    _elog_drop_lognumber_table();
+
+}
+
+
+function elog_schema()
+{
+
+    $schema['elog_lognumber'] = array(
+        'description' => 'Auto assign unique logbook entry numbers',
+        'fields' => array(
+            'lognumber' => array(
+                'description' => 'Primary Key. logentry entry number',
+                'type' => 'int',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'nid' => array(
+                'description' => 'Foreign Key. The node id of a logentry node',
+                'type' => 'int',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+        ),
+        'primary key' => array(
+            'lognumber',
+        ),
+        'unique keys' => array(
+            'nid' => array(
+                'nid',
+            ),
+        ),
+        // For documentation purposes only; Drupal does not automatically create foreign keys
+        // in the database.
+        'foreign keys' => array(
+            'lognumber_nid' => array(
+                'table' => 'node',
+                'columns' => array(
+                    'nid' => 'nid',
+                ),
+            ),
+        ),
+    );
+
+    return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function _elog_make_foreign_keys()
+{
+    // Make real foreign keys.
+    \Drupal::database()->query('
+    ALTER TABLE {elog_lognumber}
+    ADD CONSTRAINT {fk_elog_lognumber_node}
+    FOREIGN KEY (nid) REFERENCES {node} (nid)
+  ');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function _elog_drop_lognumber_table()
+{
+    // Make real foreign keys.
+    \Drupal::database()
+        ->query('DROP TABLE {elog_lognumber}');
+}
+
+
+function _elog_delete_field_storage()
+{
     if ($field_storage = Drupal\field\Entity\FieldStorageConfig::loadByName('node', 'field_logbooks')) {
         $field_storage->delete();
     }
@@ -23,14 +113,42 @@ function elog_uninstall() {
     if ($field_storage = Drupal\field\Entity\FieldStorageConfig::loadByName('node', 'field_notify')) {
         $field_storage->delete();
     }
+}
 
+function _elog_delete_config()
+{
     // It should be safe to simply call the items below without checking for existence
     // first because getEditable will instantiate the object if it doesn't exist
     // and then we'll promptly delete it either way.
-    Drupal::configFactory()->getEditable('node.logentry.field_logbooks')->delete();
+    Drupal::configFactory()->getEditable('node.logentry.field_lognumber')->delete();
     Drupal::configFactory()->getEditable('node.field_logbooks')->delete();
     Drupal::configFactory()->getEditable('node.field_entry_makers')->delete();
     Drupal::configFactory()->getEditable('node.field_notify')->delete();
+    Drupal::configFactory()->getEditable('node.field_lognumber')->delete();
+    Drupal::configFactory()->getEditable('node.logentry.field_logbooks')->delete();
 }
 
 
+/**
+ * Creates some initial taxonomy terms.
+ * Should be called after pathauto config so that the terms
+ * get assigned the desired paths.
+ */
+function _elog_initialize_vocabularies(){
+
+    $parent = Term::create([
+        'name' => 'Other Logbooks',
+        'description' => "Logbooks that don't belong to any other set",
+        'vid' => 'logbooks',
+    ]);
+    $parent->save();
+
+    $child = Term::create([
+        'name' => 'TLOG',
+        'description' => 'The Test (AKA Trash) Logbook',
+        'vid' => 'logbooks',
+        'parent' => [$parent->id()],
+    ]);
+    $child->save();
+
+}

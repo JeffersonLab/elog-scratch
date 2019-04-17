@@ -1,5 +1,16 @@
 <?php
+
+use Drupal\Core\Entity\EntityInterface;
+
 /**
-* @file
-* A description of what your module does.
-*/
+ * @file
+ * The Elog module main file.
+ */
+
+
+function elog_node_insert(EntityInterface $entity){
+
+ksm($entity->getEntityTypeId());
+ksm($entity->bundle());
+
+}

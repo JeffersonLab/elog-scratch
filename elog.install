@@ -1,0 +1,28 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: theo
+ * Date: 4/11/19
+ * Time: 10:58 AM
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function elog_uninstall() {
+
+    if ($field_storage = Drupal\field\Entity\FieldStorageConfig::loadByName('node', 'field_logbooks')) {
+        $field_storage->delete();
+    }
+    if ($field_storage = Drupal\field\Entity\FieldStorageConfig::loadByName('node', 'field_attachments')) {
+        $field_storage->delete();
+    }
+
+    // It should be safe to simply call the items below without checking for existence
+    // first because getEditable will instantiate the object if it doesn't exist
+    // and then we'll promptly delete it either way.
+    Drupal::configFactory()->getEditable('node.logentry.field_logbooks')->delete();
+    Drupal::configFactory()->getEditable('node.field_logbooks')->delete();
+}
+
+

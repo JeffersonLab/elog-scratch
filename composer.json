@@ -1,0 +1,17 @@
+{
+  "name": "jlab/elog",
+  "description": "Jefferson Lab Electronic Logbook",
+  "type": "drupal-module",
+  "homepage": "https://logbooks.jlab.org",
+  "authors": [
+    {
+      "name": "Theo Larrieu",
+      "role": "Maintainer"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "pathauto/pathauto": "^1.4"
+  }
+}
+

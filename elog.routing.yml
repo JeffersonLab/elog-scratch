@@ -1,0 +1,16 @@
+elog.content:
+  path: '/hello'
+  defaults:
+    _controller: '\Drupal\elog\Controller\ElogController::content'
+    _title: 'Hello World'
+  requirements:
+    _permission: 'access content'
+
+
+elog.entry:
+  path: '/entry/{lognumber}'
+  defaults:
+    _controller: '\Drupal\elog\Controller\ElogController::entry'
+    _title: 'Log Entry'
+  requirements:
+    _permission: 'access content'

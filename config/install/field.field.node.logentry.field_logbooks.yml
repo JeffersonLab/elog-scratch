@@ -1,0 +1,31 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - elog
+  config:
+    - field.storage.node.field_logbooks
+    - node.type.logentry
+    - taxonomy.vocabulary.logbooks
+id: node.logentry.field_logbooks
+field_name: field_logbooks
+entity_type: node
+bundle: logentry
+label: Logbook(s)
+description: 'Associate one or more logbooks with an entry'
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      logbooks: logbooks
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

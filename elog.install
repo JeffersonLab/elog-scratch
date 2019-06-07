@@ -17,7 +17,7 @@ use Drupal\taxonomy\Entity\Term;
 function elog_install()
 {
     _elog_make_foreign_keys();
-    _elog_initialize_vocabularies();
+    _elog_create_taxonomy_terms();
 }
 
 
@@ -26,13 +26,16 @@ function elog_install()
  */
 function elog_uninstall()
 {
+    _elog_remove_taxonomy_terms();
+    _elog_delete_fields();
     _elog_delete_field_storage();
     _elog_delete_config();
     _elog_drop_lognumber_table();
-
 }
 
-
+/**
+ * Implements hook_schema().
+ */
 function elog_schema()
 {
 
@@ -98,9 +101,17 @@ function _elog_drop_lognumber_table()
         ->query('DROP TABLE {elog_lognumber}');
 }
 
+function _elog_delete_fields(){
+    if( $field = Drupal\field\Entity\FieldConfig::loadByName('node','logentry','field_lognumber')){
+        $field->delete();
+    }
+}
 
 function _elog_delete_field_storage()
 {
+    if ($field_storage = Drupal\field\Entity\FieldStorageConfig::loadByName('node', 'field_lognumber')) {
+        $field_storage->delete();
+    }
     if ($field_storage = Drupal\field\Entity\FieldStorageConfig::loadByName('node', 'field_logbooks')) {
         $field_storage->delete();
     }
@@ -120,12 +131,12 @@ function _elog_delete_config()
     // It should be safe to simply call the items below without checking for existence
     // first because getEditable will instantiate the object if it doesn't exist
     // and then we'll promptly delete it either way.
+    Drupal::configFactory()->getEditable('node.field_lognumber')->delete();
     Drupal::configFactory()->getEditable('node.logentry.field_lognumber')->delete();
     Drupal::configFactory()->getEditable('node.field_logbooks')->delete();
     Drupal::configFactory()->getEditable('node.field_entry_makers')->delete();
     Drupal::configFactory()->getEditable('node.field_notify')->delete();
-    Drupal::configFactory()->getEditable('node.field_lognumber')->delete();
-    Drupal::configFactory()->getEditable('node.logentry.field_logbooks')->delete();
+
 }
 
 
@@ -134,7 +145,7 @@ function _elog_delete_config()
  * Should be called after pathauto config so that the terms
  * get assigned the desired paths.
  */
-function _elog_initialize_vocabularies(){
+function _elog_create_taxonomy_terms(){
 
     $parent = Term::create([
         'name' => 'Other Logbooks',
@@ -150,5 +161,16 @@ function _elog_initialize_vocabularies(){
         'parent' => [$parent->id()],
     ]);
     $child->save();
+
+}
+
+/**
+ * Creates some initial taxonomy terms.
+ * Should be called after pathauto config so that the terms
+ * get assigned the desired paths.
+ */
+function _elog_remove_taxonomy_terms(){
+
+
 
 }

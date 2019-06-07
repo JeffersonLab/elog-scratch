@@ -14,7 +14,8 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "lognumber",
  *   label = @Translation("Log Number"),
  *   category = @Translation("Number"),
- *   default_formatter = "lognumber_formatter",
+ *   default_widget = "lognumber_default_widget",
+ *   default_formatter = "lognumber_default_formatter",
  * )
  */
 class LogNumber extends FieldItemBase implements FieldItemInterface {

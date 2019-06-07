@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - elog
+  config:
+    - field.storage.node.field_lognumber
+    - node.type.logentry
+  module:
+    - elog
+id: node.logentry.field_lognumber
+field_name: field_lognumber
+entity_type: node
+bundle: logentry
+label: 'Log Number'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  initial_value: 1
+field_type: lognumber

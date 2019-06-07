@@ -4,35 +4,36 @@ namespace Drupal\elog\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Component\Utility\Html;
 
 /**
- * Plugin implementation of the 'lognumber_default_formatter'.
+ * Plugin implementation of the 'lognumber_link_formatter'.
  *
- * Outputs the lognumber field as plain text.
+ * Outputs the lognumber field as a link to its parent entity.
  *
  * @FieldFormatter(
- *   id = "lognumber_default_formatter",
- *   label = @Translation("Log Number default"),
+ *   id = "lognumber_link_formatter",
+ *   label = @Translation("Log Number link"),
  *   field_types = {
  *     "lognumber",
  *   },
  * )
  */
-class LogNumberDefaultFormatter extends FormatterBase {
+class LogNumberLinkFormatter extends FormatterBase {
 
     /**
      * {@inheritdoc}
      */
     public function viewElements(FieldItemListInterface $items, $langcode) {
         $elements = [];
+        $entity = $items->getEntity();
         foreach ($items as $delta => $item) {
             // Render output using an inline template
             $elements[$delta] = [
                 '#type'     => 'inline_template',
-                '#template' => '<span class="lognumber">{{ lognumber }}</span>',
+                '#template' => '<a href="{{ url }}" target="_blank"><span class="lognumber">{{ lognumber }}<span class="lognumber"></a>',
                 '#context'  => [
-                    'lognumber' => Html::escape($item->getValue()['value']),
+                    'url' => $entity->toUrl(),
+                    'lognumber' => $item->getValue()['value'],
                  ]
             ];
         }

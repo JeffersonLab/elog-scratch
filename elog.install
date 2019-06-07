@@ -16,7 +16,6 @@ use Drupal\taxonomy\Entity\Term;
  */
 function elog_install()
 {
-    _elog_make_foreign_keys();
     _elog_create_taxonomy_terms();
 }
 
@@ -44,52 +43,25 @@ function elog_schema()
         'fields' => array(
             'lognumber' => array(
                 'description' => 'Primary Key. logentry entry number',
-                'type' => 'int',
+                'type' => 'serial',
                 'unsigned' => TRUE,
                 'not null' => TRUE,
             ),
-            'nid' => array(
-                'description' => 'Foreign Key. The node id of a logentry node',
-                'type' => 'int',
-                'unsigned' => TRUE,
+            'bundle' => array(
+                'description' => 'The bundle to which lognumber belongs.',
+                'type' => 'varchar',
+                'length' => '24',
                 'not null' => TRUE,
             ),
         ),
         'primary key' => array(
             'lognumber',
         ),
-        'unique keys' => array(
-            'nid' => array(
-                'nid',
-            ),
-        ),
-        // For documentation purposes only; Drupal does not automatically create foreign keys
-        // in the database.
-        'foreign keys' => array(
-            'lognumber_nid' => array(
-                'table' => 'node',
-                'columns' => array(
-                    'nid' => 'nid',
-                ),
-            ),
-        ),
     );
 
     return $schema;
 }
 
-/**
- * Implements hook_install().
- */
-function _elog_make_foreign_keys()
-{
-    // Make real foreign keys.
-    \Drupal::database()->query('
-    ALTER TABLE {elog_lognumber}
-    ADD CONSTRAINT {fk_elog_lognumber_node}
-    FOREIGN KEY (nid) REFERENCES {node} (nid)
-  ');
-}
 
 /**
  * Implements hook_uninstall().
@@ -97,8 +69,8 @@ function _elog_make_foreign_keys()
 function _elog_drop_lognumber_table()
 {
     // Make real foreign keys.
-    \Drupal::database()
-        ->query('DROP TABLE {elog_lognumber}');
+//    \Drupal::database()
+//        ->query('DROP TABLE {elog_lognumber}');
 }
 
 function _elog_delete_fields(){

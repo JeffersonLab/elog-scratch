@@ -8,7 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
- * Provides a field type of baz.
+ * Provides a field type of lognumber.
  *
  * @FieldType(
  *   id = "lognumber",
@@ -45,7 +45,11 @@ class LogNumber extends FieldItemBase implements FieldItemInterface {
      */
     public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
         $properties = [];
-        $properties['value'] = DataDefinition::create('integer');
+        $properties['value'] = DataDefinition::create('integer')
+            ->setLabel('Lognumber')
+            ->setComputed(TRUE)
+            ->setInternal(FALSE)
+            ->setRequired(TRUE);
         return $properties;
     }
 
@@ -72,10 +76,17 @@ class LogNumber extends FieldItemBase implements FieldItemInterface {
     }
 
     protected function getLognumber(){
-        $serial = NULL;
+        $logNumber = NULL;
         $entity = $this->getEntity();
-        ksm($entity->toArray());
-        return 100;
+        if ($entity->isNew()) {
+            $connection = \Drupal::service('database');
+            $logNumber = $connection->insert('elog_lognumber')
+                ->fields([
+                    'bundle' => $entity->bundle(),
+                ])
+                ->execute();
+        }
+        return $logNumber;
     }
 
 

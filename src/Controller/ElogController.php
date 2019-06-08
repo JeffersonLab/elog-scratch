@@ -16,26 +16,27 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ElogController extends ControllerBase {
 
-    /**
-     * Display the markup.
-     *
-     * @return array
-     *   Return markup array.
-     */
-    public function content() {
-        return [
-            '#type' => 'markup',
-            '#markup' => $this->t('Hello, World!'),
-        ];
-    }
+  /**
+   * Display the markup.
+   *
+   * @return array
+   *   Return markup array.
+   */
+  public function content() {
+    return [
+      '#type' => 'markup',
+      '#markup' => $this->t('Hello, World!'),
+    ];
+  }
 
-    public function entry($lognumber, Request $request) {
-        var_dump($request->query); die;
-        return [
-            '#type' => 'markup',
-            '#markup' => $this->t('Howdy '. $this->currentUser()->getAccountName()),
-        ];
-    }
+  public function entry($lognumber, Request $request) {
+    var_dump($request->query);
+    die;
+    return [
+      '#type' => 'markup',
+      '#markup' => $this->t('Howdy ' . $this->currentUser()->getAccountName()),
+    ];
+  }
 
 
 }

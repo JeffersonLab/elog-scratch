@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -8,9 +9,16 @@ use Drupal\Core\Entity\EntityInterface;
  */
 
 
-function elog_node_insert(EntityInterface $entity){
+function elog_node_insert(EntityInterface $entity) {
 
-ksm($entity->getEntityTypeId());
-ksm($entity->bundle());
+  //ksm($entity->getEntityTypeId());
+  //ksm($entity->bundle());
+
+}
+
+function elog_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+
+  //ksm($entity->toArray());
+  //ksm($entity->bundle());
 
 }

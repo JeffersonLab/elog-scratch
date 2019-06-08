@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\elog\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemBase;
@@ -18,92 +19,127 @@ use Drupal\Core\TypedData\DataDefinition;
  *   default_formatter = "lognumber_default_formatter",
  * )
  */
-class LogNumber extends FieldItemBase implements FieldItemInterface {
+class LogNumber extends FieldItemBase {
 
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function schema(FieldStorageDefinitionInterface $field_definition) {
-        return array(
-            // columns contains the values that the field will store
-            'columns' => array(
-                'value' => array(
-                    'type' => 'int',
-                    'unsigned' => TRUE,
-                    'null' => FALSE,
-                    'sortable' => TRUE,
-                    'views' => TRUE,
-                    'index' => TRUE,
-                ),
-            ),
-        );
+  /**
+   * {@inheritdoc}
+   */
+  public static function schema(FieldStorageDefinitionInterface $field_definition) {
+    return [
+      // columns contains the values that the field will store
+      'columns' => [
+        'value' => [
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'null' => FALSE,
+          'sortable' => TRUE,
+          'views' => TRUE,
+          'index' => TRUE,
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
+    $properties = [];
+    $properties['value'] = DataDefinition::create('integer')
+      ->setLabel('Lognumber')
+      ->setComputed(TRUE)
+      ->setInternal(FALSE)
+      ->setRequired(TRUE);
+    return $properties;
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultFieldSettings() {
+    return [
+        // Declare a single setting, 'initial_value', with a default
+        // value of 1
+        'initial_value' => 1,
+      ] + parent::defaultFieldSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  //    public function isEmpty() {
+  //        $value = $this->get('value')->getValue();
+  //        // For numbers, the field is empty if the value isn't numeric.
+  //        // But should never be treated as empty.
+  //        $empty = $value === NULL || !is_numeric($value);
+  //        return $empty;
+  //    }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getValue() {
+    // Update the values and return them.
+    foreach ($this->properties as $name => $property) {
+      $value = $property->getValue();
+      // Only write NULL values if the whole map is not NULL.
+      if (isset($this->values) || isset($value)) {
+        $this->values[$name] = $value;
+      }
     }
+    return $this->values;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
-        $properties = [];
-        $properties['value'] = DataDefinition::create('integer')
-            ->setLabel('Lognumber')
-            ->setComputed(TRUE)
-            ->setInternal(FALSE)
-            ->setRequired(TRUE);
-        return $properties;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave() {
+    \Drupal::logger('LogNumber')->notice('presave is executed');
+    $value = $this->getLognumber();
+    if (isset($value)) {
+      $this->setValue($value);
     }
+  }
 
+  protected function getLognumber() {
+    $logNumber = NULL;
+    $entity = $this->getEntity();
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function defaultFieldSettings() {
-        return [
-                // Declare a single setting, 'initial_value', with a default
-                // value of 1
-                'initial_value' => 1,
-            ] + parent::defaultFieldSettings();
+    if ($entity->isNew()) {
+      $connection = \Drupal::service('database');
+      $logNumber = $connection->insert('elog_lognumber')
+        ->fields([
+          'bundle' => $entity->bundle(),
+        ])
+        ->execute();
     }
+    else {
+      die('not new');
 
-    /**
-     * {@inheritdoc}
-     */
-    public function preSave() {
-        $value = $this->getLognumber();
-        if (isset($value)) {
-            $this->setValue($value);
-        }
     }
-
-    protected function getLognumber(){
-        $logNumber = NULL;
-        $entity = $this->getEntity();
-        if ($entity->isNew()) {
-            $connection = \Drupal::service('database');
-            $logNumber = $connection->insert('elog_lognumber')
-                ->fields([
-                    'bundle' => $entity->bundle(),
-                ])
-                ->execute();
-        }
-        return $logNumber;
-    }
+    \Drupal::logger('LogNumber')->notice("assigned $logNumber");
+    return $logNumber;
+  }
 
 
-    /**
-     * {@inheritdoc}
-     */
-    public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
 
-        $element = [];
-        // The key of the element should be the setting name
-        $element['initial_value'] = [
-            '#title' => $this->t('Initial Value'),
-            '#type' => 'text',
-            '#default_value' => $this->getSetting('initial_value'),
-        ];
-        return $element;
-    }
+    $element = [];
+    // The key of the element should be the setting name
+    $element['initial_value'] = [
+      '#title' => $this->t('Initial Value'),
+      '#type' => 'text',
+      '#default_value' => $this->getSetting('initial_value'),
+    ];
+    return $element;
+  }
 
 
 }

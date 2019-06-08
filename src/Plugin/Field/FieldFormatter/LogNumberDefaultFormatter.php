@@ -21,22 +21,22 @@ use Drupal\Component\Utility\Html;
  */
 class LogNumberDefaultFormatter extends FormatterBase {
 
-    /**
-     * {@inheritdoc}
-     */
-    public function viewElements(FieldItemListInterface $items, $langcode) {
-        $elements = [];
-        foreach ($items as $delta => $item) {
-            // Render output using an inline template
-            $elements[$delta] = [
-                '#type'     => 'inline_template',
-                '#template' => '<span class="lognumber">{{ lognumber }}</span>',
-                '#context'  => [
-                    'lognumber' => Html::escape($item->getValue()['value']),
-                 ]
-            ];
-        }
-        return $elements;
+  /**
+   * {@inheritdoc}
+   */
+  public function viewElements(FieldItemListInterface $items, $langcode) {
+    $elements = [];
+    foreach ($items as $delta => $item) {
+      // Render output using an inline template
+      $elements[$delta] = [
+        '#type' => 'inline_template',
+        '#template' => '<span class="lognumber">{{ lognumber }}</span>',
+        '#context' => [
+          'lognumber' => Html::escape($item->getValue()['value']),
+        ],
+      ];
     }
+    return $elements;
+  }
 
 }

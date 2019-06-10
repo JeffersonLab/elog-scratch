@@ -1,0 +1,3 @@
+services:
+  elog.lognumber:
+    class: Drupal\elog\Service\LogNumberService

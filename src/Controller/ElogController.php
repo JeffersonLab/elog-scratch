@@ -30,8 +30,7 @@ class ElogController extends ControllerBase {
   }
 
   public function entry($lognumber, Request $request) {
-    var_dump($request->query);
-    die;
+    //var_dump($request->query);
     return [
       '#type' => 'markup',
       '#markup' => $this->t('Howdy ' . $this->currentUser()->getAccountName()),

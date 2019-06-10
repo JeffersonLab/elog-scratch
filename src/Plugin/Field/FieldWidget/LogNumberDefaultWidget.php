@@ -31,9 +31,8 @@ class LogNumberDefaultWidget extends WidgetBase {
       // throws 'This value should be of the correct primitive type'.
       // @see https://www.drupal.org/node/2220381
       // so the serial is defaulted to a positive int.
-      '#default_value' => isset($items[$delta]->value) ? $items[$delta]->value : 1,
+      '#default_value' => isset($items[$delta]->value) ? $items[$delta]->value : 0,
     ];
-    ksm($element['value']);
     return $element;
   }
 

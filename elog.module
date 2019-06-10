@@ -9,16 +9,36 @@ use Drupal\Core\Entity\EntityInterface;
  */
 
 
-function elog_node_insert(EntityInterface $entity) {
-
-  //ksm($entity->getEntityTypeId());
-  //ksm($entity->bundle());
-
-}
+/**
+ * Implements hook_ENTITY_TYPE_view().
+ *
+ * @inheritdoc
+ */
 
 function elog_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
 
-  //ksm($entity->toArray());
-  //ksm($entity->bundle());
 
 }
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ * @inheritdoc
+ */
+
+function elog_node_presave(Drupal\node\NodeInterface $node){
+
+    // Ensure that all nodes have a lognumber field assigned when they get saved.
+    if ($node->bundle() == 'logentry' && $node->isNew() ) {
+        // Even if we know the node isNew and being saved for the first time, we might already
+        // have a lognumber assigned from the LogNumberDefaultWidget if the node is being created
+        // via the web form.  When the node is created programmatically, and no form widget
+        // has been invoked, the assignment below will get invoked.
+        if ($node->get('field_lognumber')->isEmpty()){
+            $logNumberService = \Drupal::service('elog.lognumber');
+            $node->set('field_lognumber', $logNumberService->nextLogNumber() );
+        }
+    }
+}
+
+

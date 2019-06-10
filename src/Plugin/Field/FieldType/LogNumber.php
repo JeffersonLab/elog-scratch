@@ -7,6 +7,8 @@ use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\TypedData\DataDefinitionInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
  * Provides a field type of lognumber.
@@ -21,8 +23,7 @@ use Drupal\Core\TypedData\DataDefinition;
  */
 class LogNumber extends FieldItemBase {
 
-
-  /**
+    /**
    * {@inheritdoc}
    */
   public static function schema(FieldStorageDefinitionInterface $field_definition) {
@@ -69,19 +70,20 @@ class LogNumber extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  //    public function isEmpty() {
-  //        $value = $this->get('value')->getValue();
-  //        // For numbers, the field is empty if the value isn't numeric.
-  //        // But should never be treated as empty.
-  //        $empty = $value === NULL || !is_numeric($value);
-  //        return $empty;
-  //    }
+      public function isEmpty() {
+          $value = $this->get('value')->getValue();
+          // For numbers, the field is empty if the value isn't numeric.
+          // But should never be treated as empty.
+          $empty = $value === NULL || !is_numeric($value);
+          return $empty;
+      }
 
 
   /**
    * {@inheritdoc}
    */
   public function getValue() {
+      \Drupal::logger('LogNumber')->notice('getValue is executed');
     // Update the values and return them.
     foreach ($this->properties as $name => $property) {
       $value = $property->getValue();
@@ -106,23 +108,12 @@ class LogNumber extends FieldItemBase {
   }
 
   protected function getLognumber() {
-    $logNumber = NULL;
     $entity = $this->getEntity();
-
     if ($entity->isNew()) {
-      $connection = \Drupal::service('database');
-      $logNumber = $connection->insert('elog_lognumber')
-        ->fields([
-          'bundle' => $entity->bundle(),
-        ])
-        ->execute();
+      $logNumberService = \Drupal::service('elog.lognumber');
+      return $logNumberService->nextLogNumber();
     }
-    else {
-      die('not new');
-
-    }
-    \Drupal::logger('LogNumber')->notice("assigned $logNumber");
-    return $logNumber;
+    return NULL;
   }
 
 
